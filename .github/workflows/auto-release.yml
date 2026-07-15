@@ -41,6 +41,14 @@ jobs:
           fi
 
           PREVIOUS_VERSION=$(git show "${BEFORE}:package.json" | node -e "let input=''; process.stdin.on('data', c => input += c); process.stdin.on('end', () => console.log(JSON.parse(input).version || ''));")
+          PREVIOUS_NAME=$(git show "${BEFORE}:package.json" | node -e "let input=''; process.stdin.on('data', c => input += c); process.stdin.on('end', () => console.log(JSON.parse(input).name || ''));")
+          CURRENT_NAME=$(node -p "require('./package.json').name")
+
+          if [ "$CURRENT_NAME" != "$PREVIOUS_NAME" ]; then
+            echo "Package bootstrap detected (${PREVIOUS_NAME} -> ${CURRENT_NAME}); skipping auto release."
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           if [ "$CURRENT_VERSION" = "$PREVIOUS_VERSION" ]; then
             echo "package.json version did not change (${CURRENT_VERSION}); skipping."

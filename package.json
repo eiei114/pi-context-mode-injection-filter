@@ -1,84 +1,59 @@
 {
-  "name": "pi-extension-template",
-  "version": "0.1.6",
-  "description": "Template for building Pi packages with extensions, Agent Skills, prompts, and themes.",
+  "name": "pi-context-mode-injection-filter",
+  "version": "0.1.0",
+  "description": "Pi extension that prevents context-mode's synthetic routing message from superseding the latest user request.",
   "type": "module",
   "license": "MIT",
-  "author": "YOUR_NAME",
+  "author": "Keisu",
   "keywords": [
     "pi-package",
     "pi",
-    "agent-skill",
+    "context-mode",
+    "provider-payload",
     "typescript"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/eiei114/pi-extension-template"
+    "url": "https://github.com/eiei114/pi-context-mode-injection-filter"
   },
   "bugs": {
-    "url": "https://github.com/eiei114/pi-extension-template/issues"
+    "url": "https://github.com/eiei114/pi-context-mode-injection-filter/issues"
   },
-  "homepage": "https://github.com/eiei114/pi-extension-template#readme",
+  "homepage": "https://github.com/eiei114/pi-context-mode-injection-filter#readme",
   "files": [
     "extensions/",
     "lib/",
-    "skills/",
-    "prompts/",
-    "themes/",
     "docs/",
     "README.md",
     "LICENSE",
+    "SECURITY.md",
     "CHANGELOG.md"
-  ],
-  "workspaces": [
-    "packages/*"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/greeting.test.mjs tests/format-table.test.mjs tests/smoke.test.mjs tests/create-pi-extension-cli.test.mjs",
-    "ci": "npm run typecheck && npm run sync:template && npm test && npm run pack:check && node --test tests/sync-template.test.mjs",
-    "pack:check": "npm pack --dry-run --workspace create-pi-extension",
-    "sync:template": "bun run scripts/sync-template.ts",
-    "sync:template:check": "bun run scripts/sync-template.ts && node --test tests/sync-template.test.mjs"
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "ci": "npm run typecheck && npm test && npm run pack:check && npm run publish:guard",
+    "pack:check": "npm pack --dry-run",
+    "publish:guard": "node scripts/check-no-npm-token.mjs",
+    "version:check": "node scripts/check-version-bump.mjs"
   },
   "pi": {
     "extensions": [
-      "./extensions/hello.ts",
-      "./extensions/index.ts",
-      "./extensions/tui-dashboard.ts",
-      "./extensions/skill-bridge/index.ts",
-      "./extensions/package-layout/index.ts"
-    ],
-    "skills": [
-      "./skills"
-    ],
-    "prompts": [
-      "./prompts"
-    ],
-    "themes": [
-      "./themes"
+      "./extensions/index.ts"
     ]
   },
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
-    "@earendil-works/pi-agent-core": "*",
-    "@earendil-works/pi-ai": "*",
-    "@earendil-works/pi-coding-agent": "*",
-    "@earendil-works/pi-tui": "*",
-    "typebox": "*"
+  "engines": {
+    "node": ">=22"
   },
-  "overrides": {
-    "protobufjs": ">=7.6.3 <8.0.0"
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
   },
   "devDependencies": {
-    "@earendil-works/pi-agent-core": "^0.80.6",
-    "@earendil-works/pi-ai": "^0.80.6",
-    "@earendil-works/pi-coding-agent": "^0.80.6",
-    "@earendil-works/pi-tui": "^0.80.6",
-    "@types/node": "^26.0.0",
-    "typebox": "latest",
+    "@earendil-works/pi-coding-agent": "^0.80.7",
+    "@types/node": "^24.0.0",
     "typescript": "^6.0.3"
   }
 }

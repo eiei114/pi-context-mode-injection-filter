@@ -2,14 +2,6 @@ name: Publish to npm
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - package.json
-      - package-lock.json
-      - packages/create-pi-extension/**
-      - scripts/sync-template.ts
-      - .github/workflows/publish.yml
     tags:
       - 'v*.*.*'
   release:
@@ -31,7 +23,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish create-pi-extension
+    name: Publish package
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +37,7 @@ jobs:
         id: published
         shell: bash
         run: |
-          name=$(node -p "require('./packages/create-pi-extension/package.json').name")
+          name=$(node -p "require('./package.json').name")
           version=$(node -p "require('./package.json').version")
           encoded_name="${name//\//%2F}"
           registry_url="https://registry.npmjs.org/${encoded_name}/${version}"
@@ -72,24 +64,11 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
       - name: Install dependencies
         run: npm ci
 
-      - name: Sync bundled template
-        run: npm run sync:template
-
       - name: Validate package
         run: npm run ci
-
-      - name: Verify publish tarball includes bundled template
-        shell: bash
-        run: |
-          cd packages/create-pi-extension
-          npm pack --dry-run 2>&1 | tee /tmp/pack.txt
-          grep -q 'template/' /tmp/pack.txt
 
       - name: Setup npm Trusted Publishing
         if: steps.published.outputs.skip != 'true'
@@ -103,7 +82,6 @@ jobs:
         if: steps.published.outputs.skip != 'true'
         run: npm install -g npm@latest
 
-      - name: Publish create-pi-extension to npm
+      - name: Publish package to npm
         if: steps.published.outputs.skip != 'true'
-        working-directory: packages/create-pi-extension
         run: npm publish --access public
