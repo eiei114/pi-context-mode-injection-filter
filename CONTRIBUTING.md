@@ -1,37 +1,20 @@
 # Contributing
 
-Thanks for helping improve this Pi package.
-
-## Development
+## Development setup
 
 ```bash
 npm install
 npm run ci
 ```
 
-## Local Pi testing
-
-```bash
-pi -e .
-```
-
 ## Pull requests
 
-Before opening a PR:
+- Keep changes focused.
+- Add tests for behavior changes.
+- Update `CHANGELOG.md` when package behavior changes.
+- Run `npm run ci` before opening a pull request.
 
-- Run `npm run ci`
-- Update docs when behavior changes
-- Update `CHANGELOG.md` for user-facing changes
-- Keep package contents small and intentional
-- Run `npm pack --dry-run` when you add, remove, or rename `docs/` files so `package.json` `files` matches what you ship
+## Release safety
 
-## Release
-
-Releases publish **`create-pi-extension`** to npm through Trusted Publishing. The root template source is not published. Do not add `NPM_TOKEN` to GitHub Secrets.
-
-```bash
-npm version patch
-git push
-```
-
-See `docs/release.md` for Trusted Publisher settings and the monorepo publish path.
+Publishing uses npm Trusted Publishing. Never add long-lived npm credentials to
+GitHub workflow files or repository secrets.
