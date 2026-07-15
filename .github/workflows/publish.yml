@@ -1,0 +1,109 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - package.json
+      - package-lock.json
+      - packages/create-pi-extension/**
+      - scripts/sync-template.ts
+      - .github/workflows/publish.yml
+    tags:
+      - 'v*.*.*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to publish (defaults to selected ref)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-${{ github.event.inputs.ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish create-pi-extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - name: Skip already published version
+        id: published
+        shell: bash
+        run: |
+          name=$(node -p "require('./packages/create-pi-extension/package.json').name")
+          version=$(node -p "require('./package.json').version")
+          encoded_name="${name//\//%2F}"
+          registry_url="https://registry.npmjs.org/${encoded_name}/${version}"
+
+          http_status=$(curl -sS -o /dev/null -w '%{http_code}' "$registry_url")
+          case "$http_status" in
+            200)
+              echo "${name}@${version} is already published on npm; publish intentionally skipped."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              ;;
+            404)
+              echo "Version ${name}@${version} is not on npm yet; continuing to publish."
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unexpected npm registry response for ${name}@${version}: HTTP ${http_status}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync bundled template
+        run: npm run sync:template
+
+      - name: Validate package
+        run: npm run ci
+
+      - name: Verify publish tarball includes bundled template
+        shell: bash
+        run: |
+          cd packages/create-pi-extension
+          npm pack --dry-run 2>&1 | tee /tmp/pack.txt
+          grep -q 'template/' /tmp/pack.txt
+
+      - name: Setup npm Trusted Publishing
+        if: steps.published.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Ensure npm supports trusted publishing
+        if: steps.published.outputs.skip != 'true'
+        run: npm install -g npm@latest
+
+      - name: Publish create-pi-extension to npm
+        if: steps.published.outputs.skip != 'true'
+        working-directory: packages/create-pi-extension
+        run: npm publish --access public
