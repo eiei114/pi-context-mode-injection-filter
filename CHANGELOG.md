@@ -6,6 +6,12 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-12
+
+### Changed
+
+- Bump dev dependencies: `@earendil-works/pi-coding-agent`, `@types/node`, and `typescript`.
+
 ## [0.1.2] - 2026-08-04
 
 ### Changed
