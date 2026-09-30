@@ -8,6 +8,12 @@ All notable changes to this project are documented here.
 
 This project follows semantic versioning.
 
+## [0.1.5] - 2026-09-30
+
+### Changed
+
+- Update `@earendil-works/pi-*` dependencies to `0.99.1`.
+
 ## [Unreleased]
 
 ## [0.1.3] - 2026-09-12
