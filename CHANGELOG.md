@@ -16,6 +16,12 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Pin the development Pi SDK to 1.1.0 while preserving the published wildcard peer range.
+- Run an isolated Pi process smoke for provider-payload filtering in CI.
+- Keep verification-only dependency and evidence changes out of the package release-version gate.
+
 ## [0.1.3] - 2026-09-12
 
 ### Changed
