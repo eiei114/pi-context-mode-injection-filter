@@ -14,13 +14,14 @@ This project follows semantic versioning.
 
 - Update `@earendil-works/pi-*` dependencies to `0.99.1`.
 
-## [Unreleased]
+## [0.1.6] - 2026-10-12
 
 ### Changed
 
 - Pin the development Pi SDK to 1.1.0 while preserving the published wildcard peer range.
 - Run an isolated Pi process smoke for provider-payload filtering in CI.
-- Keep verification-only dependency and evidence changes out of the package release-version gate.
+- Include published Pi SDK smoke evidence in the patch release and require version bumps for packaged documentation changes.
+- Write smoke reports to a temporary directory by default; update the committed report only with `--write-report`.
 
 ## [0.1.3] - 2026-09-12
 

@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from "node:child_process";
 import { createServer } from "node:http";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
@@ -17,7 +17,11 @@ import {
 } from "./pi-sdk-smoke-contract.mjs";
 
 const root = resolve(import.meta.dirname, "..");
-const reportPath = resolve(root, "docs/verification/pi-sdk-smoke.json");
+const writeReport = process.argv.includes("--write-report");
+const reportDirectory = writeReport
+  ? resolve(root, "docs/verification")
+  : await mkdtemp(join(tmpdir(), "pi-sdk-smoke-report-"));
+const reportPath = join(reportDirectory, "pi-sdk-smoke.json");
 const manifest = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 const readJson = async (path) => JSON.parse(await readFile(path, "utf8"));
 const installedVersions = Object.fromEntries(await Promise.all(SDK_NAMES.map(async (name) => {
@@ -399,11 +403,12 @@ async function main() {
     cases: cases.map(({ has_unhandled_error, has_load_error, ...item }) => item),
   };
 
-  await (await import("node:fs/promises")).mkdir(resolve(root, "docs/verification"), { recursive: true });
+  if (writeReport) await mkdir(reportDirectory, { recursive: true });
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({
     verification_contract: VERIFICATION_CONTRACT,
     platform: process.platform,
+    report_path: reportPath,
     cases: cases.map(({ name, passed, exit_code }) => ({ name, passed, exit_code })),
   }));
   if (cases.some((item) => !item.passed)) process.exitCode = 1;

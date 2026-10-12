@@ -5,12 +5,13 @@ import { isReleaseVersionRelevantChange } from "../scripts/package-change-policy
 const baseManifest = {
   name: "pi-context-mode-injection-filter",
   version: "0.1.5",
+  files: ["extensions/", "lib/", "docs/"],
   peerDependencies: { "@earendil-works/pi-coding-agent": "*" },
   devDependencies: { "@earendil-works/pi-coding-agent": "^0.99.1" },
   scripts: { typecheck: "tsc --noEmit", test: "node --test", ci: "npm test" },
 };
 
-test("verification-only changes do not trigger a package release version", () => {
+test("SDK verification scripts do not trigger a package release version", () => {
   const headManifest = {
     ...baseManifest,
     devDependencies: { "@earendil-works/pi-coding-agent": "1.1.0" },
@@ -21,7 +22,8 @@ test("verification-only changes do not trigger a package release version", () =>
     },
   };
   assert.equal(isReleaseVersionRelevantChange("package.json", baseManifest, headManifest), false);
-  assert.equal(isReleaseVersionRelevantChange("docs/verification/pi-sdk-smoke.json", baseManifest, headManifest), false);
+  // docs/ is included by the package files allowlist, so verification reports ship too.
+  assert.equal(isReleaseVersionRelevantChange("docs/verification/pi-sdk-smoke.json", baseManifest, headManifest), true);
   assert.equal(isReleaseVersionRelevantChange("scripts/pi-sdk-smoke.mjs", baseManifest, headManifest), false);
   assert.equal(isReleaseVersionRelevantChange("tests/pi-sdk-smoke.test.mjs", baseManifest, headManifest), false);
 });

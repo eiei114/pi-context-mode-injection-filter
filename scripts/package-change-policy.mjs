@@ -13,8 +13,6 @@ function releaseRelevantManifest(manifest) {
 }
 
 export function isReleaseVersionRelevantChange(file, baseManifest, headManifest) {
-  // Machine-generated verification evidence is not release-facing documentation.
-  if (file.startsWith("docs/verification/")) return false;
   if (file === "package.json") {
     return JSON.stringify(releaseRelevantManifest(baseManifest)) !==
       JSON.stringify(releaseRelevantManifest(headManifest));
