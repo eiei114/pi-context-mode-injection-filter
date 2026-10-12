@@ -1,10 +1,7 @@
 name: Auto Release
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - package.json
+  workflow_dispatch:
 
 permissions:
   actions: write
@@ -25,14 +22,16 @@ jobs:
         shell: bash
         run: |
           BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || printf '%s' "$BEFORE" | grep -Eq '^0+$'; then
+            BEFORE=$(git tag --sort=-version:refname | head -1)
+            if [ -z "$BEFORE" ]; then
+              echo "No previous version tag is available; skipping manual release."
+              echo "released=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           TAG="v${CURRENT_VERSION}"
-
-          if [ -z "$BEFORE" ] || printf '%s' "$BEFORE" | grep -Eq '^0+$'; then
-            echo "No previous commit is available; skipping auto release."
-            echo "released=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
 
           if ! git cat-file -e "${BEFORE}:package.json" 2>/dev/null; then
             echo "Previous package.json is not available; skipping auto release."
