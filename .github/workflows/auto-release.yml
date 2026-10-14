@@ -1,10 +1,7 @@
-name: Auto Release
+name: Release (manual)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - package.json
+  workflow_dispatch:
 
 permissions:
   actions: write
@@ -12,6 +9,10 @@ permissions:
 
 jobs:
   release:
+    # A manual dispatch can select any ref, and the selected ref's workflow code
+    # does not receive write permission beyond the default branch's, so keep the
+    # privileged work pinned to main.
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     name: Create release for new version
     runs-on: ubuntu-latest
     steps:
@@ -24,24 +25,27 @@ jobs:
         id: check
         shell: bash
         run: |
-          BEFORE="${{ github.event.before }}"
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           TAG="v${CURRENT_VERSION}"
 
-          if [ -z "$BEFORE" ] || printf '%s' "$BEFORE" | grep -Eq '^0+$'; then
-            echo "No previous commit is available; skipping auto release."
+          # A manual dispatch has no push "before" SHA. Use the latest stable
+          # release tag as the baseline, and ignore prerelease tags so a
+          # vX.Y.Z-rc.N tag cannot become the comparison baseline.
+          PREVIOUS_TAG=$(git tag --list 'v[0-9]*' --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous stable release tag is available; skipping manual release."
             echo "released=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if ! git cat-file -e "${BEFORE}:package.json" 2>/dev/null; then
+          if ! git cat-file -e "${PREVIOUS_TAG}:package.json" 2>/dev/null; then
             echo "Previous package.json is not available; skipping auto release."
             echo "released=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          PREVIOUS_VERSION=$(git show "${BEFORE}:package.json" | node -e "let input=''; process.stdin.on('data', c => input += c); process.stdin.on('end', () => console.log(JSON.parse(input).version || ''));")
-          PREVIOUS_NAME=$(git show "${BEFORE}:package.json" | node -e "let input=''; process.stdin.on('data', c => input += c); process.stdin.on('end', () => console.log(JSON.parse(input).name || ''));")
+          PREVIOUS_VERSION=$(git show "${PREVIOUS_TAG}:package.json" | node -e "let input=''; process.stdin.on('data', c => input += c); process.stdin.on('end', () => console.log(JSON.parse(input).version || ''));")
+          PREVIOUS_NAME=$(git show "${PREVIOUS_TAG}:package.json" | node -e "let input=''; process.stdin.on('data', c => input += c); process.stdin.on('end', () => console.log(JSON.parse(input).name || ''));")
           CURRENT_NAME=$(node -p "require('./package.json').name")
 
           if [ "$CURRENT_NAME" != "$PREVIOUS_NAME" ]; then
@@ -54,6 +58,19 @@ jobs:
             echo "package.json version did not change (${CURRENT_VERSION}); skipping."
             echo "released=false" >> "$GITHUB_OUTPUT"
             exit 0
+          fi
+
+          # Equality alone is not enough: a lower but different version would
+          # create an out-of-order tag/release. Require a strictly newer version.
+          if ! node -e '
+            const parse = (v) => v.split(".").map(Number);
+            const [a, b] = [parse(process.argv[1]), parse(process.argv[2])];
+            for (let i = 0; i < 3; i += 1) if (a[i] !== b[i]) process.exit(a[i] > b[i] ? 0 : 1);
+            process.exit(1);
+          ' "$CURRENT_VERSION" "$PREVIOUS_VERSION"; then
+            echo "::error::Refusing to release ${CURRENT_VERSION}; it is not newer than the released ${PREVIOUS_VERSION}."
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            exit 1
           fi
 
           if git tag -l "$TAG" | grep -qx "$TAG"; then
@@ -71,7 +88,9 @@ jobs:
         shell: bash
         run: |
           TAG="${{ steps.check.outputs.tag }}"
-          PREV_TAG=$(git tag --sort=-version:refname | head -1)
+          # Exclude the tag being released, and compare against the previous
+          # stable release only.
+          PREV_TAG=$(git tag --list 'v[0-9]*' --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -vx "$TAG" | head -1)
           NOTES="Released ${TAG}."
           if [ -n "$PREV_TAG" ]; then
             NOTES="${NOTES}\n\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${TAG}"

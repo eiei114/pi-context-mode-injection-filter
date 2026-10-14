@@ -2,6 +2,7 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { isReleaseVersionRelevantChange } from "./package-change-policy.mjs";
 
 function git(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim();
@@ -51,9 +52,8 @@ if (basePackage.name !== headPackage.name) {
 const changed = git(["diff", "--name-only", `${baseRef}...HEAD`])
   .split("\n")
   .filter(Boolean);
-const publishablePrefixes = ["extensions/", "lib/", "docs/", "README.md", "package.json"];
-const publishableChanged = changed.some((file) =>
-  publishablePrefixes.some((prefix) => file === prefix || file.startsWith(prefix)),
+const versionRelevantChanged = changed.some((file) =>
+  isReleaseVersionRelevantChange(file, basePackage, headPackage),
 );
 const comparison = compareVersions(headPackage.version, basePackage.version);
 
@@ -61,7 +61,7 @@ if (comparison < 0) {
   throw new Error(`Version went backwards: ${basePackage.version} -> ${headPackage.version}`);
 }
 
-if (publishableChanged && comparison === 0) {
+if (versionRelevantChanged && comparison === 0) {
   throw new Error("Publishable files changed without a package version bump");
 }
 
