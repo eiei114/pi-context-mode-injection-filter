@@ -1,6 +1,6 @@
 {
   "name": "pi-context-mode-injection-filter",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Pi extension that prevents context-mode's synthetic routing message from superseding the latest user request.",
   "type": "module",
   "license": "MIT",
@@ -53,10 +53,10 @@
     "@earendil-works/pi-coding-agent": "*"
   },
   "devDependencies": {
-    "@earendil-works/pi-agent-core": "1.1.0",
-    "@earendil-works/pi-ai": "1.1.0",
-    "@earendil-works/pi-coding-agent": "1.1.0",
-    "@earendil-works/pi-tui": "1.1.0",
+    "@earendil-works/pi-agent-core": "1.2.0",
+    "@earendil-works/pi-ai": "1.2.0",
+    "@earendil-works/pi-coding-agent": "1.2.0",
+    "@earendil-works/pi-tui": "1.2.0",
     "@types/node": "^26.5.1",
     "typescript": "^7.0.2"
   }

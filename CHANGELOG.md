@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.7] - 2026-10-16
+
+### Changed
+
+- Pin development and smoke verification to Pi SDK 1.2.0 while preserving the published wildcard peer range.
+
 ## 0.1.4 - 2026-09-27
 
 - chore: periodic patch bump after 7+ days without npm publish

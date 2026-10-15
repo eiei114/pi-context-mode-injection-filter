@@ -2,13 +2,13 @@
   "schema_version": 1,
   "verification_contract": "pi-sdk-behavior-v2",
   "sdk_versions": {
-    "@earendil-works/pi-agent-core": "1.1.0",
-    "@earendil-works/pi-ai": "1.1.0",
-    "@earendil-works/pi-coding-agent": "1.1.0",
-    "@earendil-works/pi-tui": "1.1.0"
+    "@earendil-works/pi-agent-core": "1.2.0",
+    "@earendil-works/pi-ai": "1.2.0",
+    "@earendil-works/pi-coding-agent": "1.2.0",
+    "@earendil-works/pi-tui": "1.2.0"
   },
   "platform": "win32",
-  "model_inference": "none; actual Pi 1.1.0 process with an offline local deterministic OpenAI-compatible provider; the Pi host, extension loader/lifecycle, provider request hook, and feature code are not mocked",
+  "model_inference": "none; actual Pi 1.2.0 process with an offline local deterministic OpenAI-compatible provider; the Pi host, extension loader/lifecycle, provider request hook, and feature code are not mocked",
   "unhandled_errors": 0,
   "extension_load_errors": 0,
   "cases": [
@@ -17,11 +17,11 @@
       "command": "npm run smoke:pi",
       "exit_code": 0,
       "passed": true,
-      "evidence": "{\"process\":{\"exit_code\":0,\"signal\":null,\"timed_out\":false,\"cleanup_error\":null,\"error\":null,\"has_unhandled_error\":false,\"has_load_error\":false,\"rpc_records\":[{\"type\":\"response\",\"command\":\"prompt\",\"success\":true,\"disposition\":\"started\"},{\"type\":\"message_end\",\"role\":\"assistant\",\"stopReason\":\"stop\",\"text\":\"Filtered request accepted.\"},{\"type\":\"agent_end\",\"assistantMessages\":[{\"stopReason\":\"stop\",\"text\":\"Filtered request accepted.\"}]},{\"type\":\"agent_settled\"}],\"stderr\":\"\"},\"requests\":[{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"extension registration probe \"],\"routingAnchorPresent\":false}],\"marker\":\"extension registration probe\",\"assertions\":[{\"id\":\"extension_registered\",\"expected\":\"The actual Pi 1.1.0 host loads the extension and sends the hook-filtered request to the provider\",\"observed\":{\"exit_code\":0,\"request\":{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"extension registration probe \"],\"routingAnchorPresent\":false}},\"passed\":true}]}",
+      "evidence": "{\"process\":{\"exit_code\":0,\"signal\":null,\"timed_out\":false,\"cleanup_error\":null,\"error\":null,\"has_unhandled_error\":false,\"has_load_error\":false,\"rpc_records\":[{\"type\":\"response\",\"command\":\"prompt\",\"success\":true,\"disposition\":\"started\"},{\"type\":\"message_end\",\"role\":\"assistant\",\"stopReason\":\"stop\",\"text\":\"Filtered request accepted.\"},{\"type\":\"agent_end\",\"assistantMessages\":[{\"stopReason\":\"stop\",\"text\":\"Filtered request accepted.\"}]},{\"type\":\"agent_settled\"}],\"stderr\":\"\"},\"requests\":[{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"extension registration probe \"],\"routingAnchorPresent\":false}],\"marker\":\"extension registration probe\",\"assertions\":[{\"id\":\"extension_registered\",\"expected\":\"The actual Pi 1.2.0 host loads the extension and sends the hook-filtered request to the provider\",\"observed\":{\"exit_code\":0,\"request\":{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"extension registration probe \"],\"routingAnchorPresent\":false}},\"passed\":true}]}",
       "assertions": [
         {
           "id": "extension_registered",
-          "expected": "The actual Pi 1.1.0 host loads the extension and sends the hook-filtered request to the provider",
+          "expected": "The actual Pi 1.2.0 host loads the extension and sends the hook-filtered request to the provider",
           "observed": {
             "exit_code": 0,
             "request": {
@@ -68,7 +68,7 @@
       "command": "npm run smoke:pi",
       "exit_code": 0,
       "passed": true,
-      "evidence": "{\"process\":{\"exit_code\":0,\"signal\":null,\"timed_out\":false,\"cleanup_error\":null,\"error\":null,\"has_unhandled_error\":false,\"has_load_error\":false,\"rpc_records\":[{\"type\":\"response\",\"command\":\"prompt\",\"success\":true,\"disposition\":\"started\"},{\"type\":\"message_end\",\"role\":\"assistant\",\"stopReason\":\"error\",\"errorMessage\":\"400: {\\\"message\\\":\\\"deliberate smoke provider error\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"smoke_error\\\"}\",\"text\":\"\"},{\"type\":\"agent_end\",\"assistantMessages\":[{\"stopReason\":\"error\",\"errorMessage\":\"400: {\\\"message\\\":\\\"deliberate smoke provider error\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"smoke_error\\\"}\",\"text\":\"\"}]},{\"type\":\"agent_settled\"}],\"stderr\":\"\"},\"requests\":[{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"Handle this provider error. \"],\"routingAnchorPresent\":false}],\"marker\":\"Handle this provider error.\",\"assertions\":[{\"id\":\"handled_error\",\"expected\":\"A deliberate local provider rejection is surfaced as a handled assistant error after the extension filters the actual request\",\"observed\":{\"exit_code\":0,\"request\":{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"Handle this provider error. \"],\"routingAnchorPresent\":false},\"providerError\":{\"role\":\"assistant\",\"content\":[],\"api\":\"openai-completions\",\"provider\":\"openai\",\"model\":\"pi-context-mode-smoke\",\"usage\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0,\"totalTokens\":0,\"cost\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0,\"total\":0}},\"stopReason\":\"error\",\"timestamp\":1791792563043,\"errorMessage\":\"400: {\\\"message\\\":\\\"deliberate smoke provider error\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"smoke_error\\\"}\",\"durationMs\":16,\"thinkingLevel\":\"off\"}},\"passed\":true}]}",
+      "evidence": "{\"process\":{\"exit_code\":0,\"signal\":null,\"timed_out\":false,\"cleanup_error\":null,\"error\":null,\"has_unhandled_error\":false,\"has_load_error\":false,\"rpc_records\":[{\"type\":\"response\",\"command\":\"prompt\",\"success\":true,\"disposition\":\"started\"},{\"type\":\"message_end\",\"role\":\"assistant\",\"stopReason\":\"error\",\"errorMessage\":\"400: {\\\"message\\\":\\\"deliberate smoke provider error\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"smoke_error\\\"}\",\"text\":\"\"},{\"type\":\"agent_end\",\"assistantMessages\":[{\"stopReason\":\"error\",\"errorMessage\":\"400: {\\\"message\\\":\\\"deliberate smoke provider error\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"smoke_error\\\"}\",\"text\":\"\"}]},{\"type\":\"agent_settled\"}],\"stderr\":\"\"},\"requests\":[{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"Handle this provider error. \"],\"routingAnchorPresent\":false}],\"marker\":\"Handle this provider error.\",\"assertions\":[{\"id\":\"handled_error\",\"expected\":\"A deliberate local provider rejection is surfaced as a handled assistant error after the extension filters the actual request\",\"observed\":{\"exit_code\":0,\"request\":{\"model\":\"pi-context-mode-smoke\",\"userTexts\":[\"Handle this provider error. \"],\"routingAnchorPresent\":false},\"providerError\":{\"role\":\"assistant\",\"content\":[],\"api\":\"openai-completions\",\"provider\":\"openai\",\"model\":\"pi-context-mode-smoke\",\"usage\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0,\"totalTokens\":0,\"cost\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0,\"total\":0}},\"stopReason\":\"error\",\"timestamp\":1792092917695,\"errorMessage\":\"400: {\\\"message\\\":\\\"deliberate smoke provider error\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"smoke_error\\\"}\",\"durationMs\":16,\"thinkingLevel\":\"off\"}},\"passed\":true}]}",
       "assertions": [
         {
           "id": "handled_error",
@@ -103,7 +103,7 @@
                 }
               },
               "stopReason": "error",
-              "timestamp": 1791792563043,
+              "timestamp": 1792092917695,
               "errorMessage": "400: {\"message\":\"deliberate smoke provider error\",\"type\":\"invalid_request_error\",\"code\":\"smoke_error\"}",
               "durationMs": 16,
               "thinkingLevel": "off"
@@ -173,15 +173,15 @@
       "command": "npm run smoke:pi",
       "exit_code": 0,
       "passed": true,
-      "evidence": "{\"process\":{\"exit_code\":0,\"signal\":null,\"timed_out\":false,\"cleanup_error\":null,\"error\":null,\"has_unhandled_error\":false,\"has_load_error\":false,\"rpc_records\":[],\"stderr\":\"\"},\"assertions\":[{\"id\":\"native_shell_boundary\",\"expected\":\"The native host shell launches this checkout's pinned Pi CLI and returns exactly 1.1.0\",\"observed\":{\"exit_code\":0,\"output\":\"1.1.0\",\"expectedVersion\":\"1.1.0\"},\"passed\":true}]}",
+      "evidence": "{\"process\":{\"exit_code\":0,\"signal\":null,\"timed_out\":false,\"cleanup_error\":null,\"error\":null,\"has_unhandled_error\":false,\"has_load_error\":false,\"rpc_records\":[],\"stderr\":\"\"},\"assertions\":[{\"id\":\"native_shell_boundary\",\"expected\":\"The native host shell launches this checkout's pinned Pi CLI and returns exactly 1.2.0\",\"observed\":{\"exit_code\":0,\"output\":\"1.2.0\",\"expectedVersion\":\"1.2.0\"},\"passed\":true}]}",
       "assertions": [
         {
           "id": "native_shell_boundary",
-          "expected": "The native host shell launches this checkout's pinned Pi CLI and returns exactly 1.1.0",
+          "expected": "The native host shell launches this checkout's pinned Pi CLI and returns exactly 1.2.0",
           "observed": {
             "exit_code": 0,
-            "output": "1.1.0",
-            "expectedVersion": "1.1.0"
+            "output": "1.2.0",
+            "expectedVersion": "1.2.0"
           },
           "passed": true
         }
