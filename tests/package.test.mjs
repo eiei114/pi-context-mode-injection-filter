@@ -21,7 +21,7 @@ test("pins the frozen SDK for tests without narrowing the published peer range",
     "@earendil-works/pi-coding-agent",
     "@earendil-works/pi-tui",
   ]) {
-    assert.equal(packageJson.devDependencies[name], "1.1.0");
+    assert.equal(packageJson.devDependencies[name], "1.2.0");
   }
   assert.equal(packageJson.peerDependencies["@earendil-works/pi-coding-agent"], "*");
   assert.match(packageJson.scripts.ci, /npm run smoke:pi/);

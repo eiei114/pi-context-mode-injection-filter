@@ -25,10 +25,10 @@ const successfulProcess = { exit_code: 0, timed_out: false, has_unhandled_error:
 test("behavior contract and bounded probe settings are frozen", () => {
   assert.equal(VERIFICATION_CONTRACT, "pi-sdk-behavior-v2");
   assert.deepEqual(SDK_VERSIONS, {
-    "@earendil-works/pi-agent-core": "1.1.0",
-    "@earendil-works/pi-ai": "1.1.0",
-    "@earendil-works/pi-coding-agent": "1.1.0",
-    "@earendil-works/pi-tui": "1.1.0",
+    "@earendil-works/pi-agent-core": "1.2.0",
+    "@earendil-works/pi-ai": "1.2.0",
+    "@earendil-works/pi-coding-agent": "1.2.0",
+    "@earendil-works/pi-tui": "1.2.0",
   });
   assert.ok(PROBE_TIMEOUT_MS <= 15_000);
   assert.deepEqual(parseJsonLines(`not-json\r\n${JSON.stringify(successMessage)}\n`), [successMessage]);
@@ -112,9 +112,9 @@ test("reload assertions reject missing second-host behavior or unclean process e
 
 test("native host shell requires the exact pinned SDK CLI version", () => {
   assert.equal(behaviorAssertions("host_shell", {
-    processResult: { exit_code: 0, stdout: "1.1.0\r\n" },
+    processResult: { exit_code: 0, stdout: "1.2.0\r\n" },
   })[0].passed, true);
-  for (const output of ["", "1.0.0", "11.1.0", "1.1.0 plus noise"]) {
+  for (const output of ["", "1.0.0", "11.2.0", "1.2.0 plus noise"]) {
     assert.equal(behaviorAssertions("host_shell", {
       processResult: { exit_code: 0, stdout: output },
     })[0].passed, false);
