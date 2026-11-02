@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8] - 2026-11-02
+
+### Changed
+
+- Derive Pi SDK smoke and contract checks from the exact versions pinned in `package.json`.
+- Update the development `@earendil-works/pi-agent-core` pin to 1.4.0.
+
 ## [0.1.7] - 2026-10-16
 
 ### Changed
