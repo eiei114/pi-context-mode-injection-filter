@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.8] - 2026-11-03
+
+### Changed
+
+- Pin the development Pi coding-agent SDK to 1.4.0 and derive smoke verification from the manifest pins.
+
 ## [0.1.7] - 2026-10-16
 
 ### Changed

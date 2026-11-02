@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
@@ -6,9 +7,12 @@ import {
   parseJsonLines,
   PROBE_TIMEOUT_MS,
   ROUTING_ANCHOR,
+  SDK_NAMES,
   SDK_VERSIONS,
   VERIFICATION_CONTRACT,
 } from "../scripts/pi-sdk-smoke-contract.mjs";
+
+const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 const request = (text, anchorPresent = false) => ({
   model: "pi-context-mode-smoke",
@@ -24,12 +28,9 @@ const successfulProcess = { exit_code: 0, timed_out: false, has_unhandled_error:
 
 test("behavior contract and bounded probe settings are frozen", () => {
   assert.equal(VERIFICATION_CONTRACT, "pi-sdk-behavior-v2");
-  assert.deepEqual(SDK_VERSIONS, {
-    "@earendil-works/pi-agent-core": "1.2.0",
-    "@earendil-works/pi-ai": "1.2.0",
-    "@earendil-works/pi-coding-agent": "1.2.0",
-    "@earendil-works/pi-tui": "1.2.0",
-  });
+  assert.deepEqual(SDK_VERSIONS, Object.fromEntries(
+    SDK_NAMES.map((name) => [name, packageJson.devDependencies[name]]),
+  ));
   assert.ok(PROBE_TIMEOUT_MS <= 15_000);
   assert.deepEqual(parseJsonLines(`not-json\r\n${JSON.stringify(successMessage)}\n`), [successMessage]);
 });
@@ -111,10 +112,11 @@ test("reload assertions reject missing second-host behavior or unclean process e
 });
 
 test("native host shell requires the exact pinned SDK CLI version", () => {
+  const pinnedVersion = SDK_VERSIONS["@earendil-works/pi-coding-agent"];
   assert.equal(behaviorAssertions("host_shell", {
-    processResult: { exit_code: 0, stdout: "1.2.0\r\n" },
+    processResult: { exit_code: 0, stdout: `${pinnedVersion}\r\n` },
   })[0].passed, true);
-  for (const output of ["", "1.0.0", "11.2.0", "1.2.0 plus noise"]) {
+  for (const output of ["", "1.0.0", "11.2.0", `${pinnedVersion} plus noise`]) {
     assert.equal(behaviorAssertions("host_shell", {
       processResult: { exit_code: 0, stdout: output },
     })[0].passed, false);
