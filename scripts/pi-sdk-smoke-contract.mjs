@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 export const VERIFICATION_CONTRACT = "pi-sdk-behavior-v2";
 export const SDK_NAMES = [
   "@earendil-works/pi-agent-core",
@@ -5,7 +7,11 @@ export const SDK_NAMES = [
   "@earendil-works/pi-coding-agent",
   "@earendil-works/pi-tui",
 ];
-export const SDK_VERSIONS = Object.fromEntries(SDK_NAMES.map((name) => [name, "1.2.0"]));
+const packageManifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+export const SDK_VERSIONS = Object.fromEntries(
+  SDK_NAMES.map((name) => [name, packageManifest.devDependencies[name]]),
+);
+const piCodingAgentVersion = SDK_VERSIONS["@earendil-works/pi-coding-agent"];
 export const ROUTING_ANCHOR =
   "context-mode active. Hierarchy: ctx_batch_execute > ctx_execute > ctx_execute_file > ctx_search. " +
   "Read/edit files → ctx_execute_file. Multi-command research → ctx_batch_execute. " +
@@ -59,7 +65,7 @@ function normalizedRequest(request, marker, requireActiveMemory = false) {
 }
 
 export function behaviorAssertions(name, observation) {
-  const { processResult, requests = [], records = [], expectedVersion = "1.2.0" } = observation;
+  const { processResult, requests = [], records = [], expectedVersion = piCodingAgentVersion } = observation;
   const messages = assistantMessages(records);
   const userTexts = (requests[0]?.userTexts ?? []).join("\n");
   const assistantText = messages.map(textFromMessage).join("\n");
@@ -68,7 +74,7 @@ export function behaviorAssertions(name, observation) {
     const request = requests.find((item) => normalizedRequest(item, "extension registration probe"));
     return [assertion(
       "extension_registered",
-      "The actual Pi 1.2.0 host loads the extension and sends the hook-filtered request to the provider",
+      `The actual Pi ${piCodingAgentVersion} host loads the extension and sends the hook-filtered request to the provider`,
       { exit_code: processResult?.exit_code ?? null, request: request ?? null },
       processResult?.exit_code === 0 && !!request,
     )];
@@ -133,7 +139,7 @@ export function behaviorAssertions(name, observation) {
     const output = processResult?.stdout?.trim() ?? "";
     return [assertion(
       "native_shell_boundary",
-      "The native host shell launches this checkout's pinned Pi CLI and returns exactly 1.2.0",
+      `The native host shell launches this checkout's pinned Pi CLI and returns exactly ${expectedVersion}`,
       { exit_code: processResult?.exit_code ?? null, output, expectedVersion },
       processResult?.exit_code === 0 && output === expectedVersion,
     )];
