@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { SDK_NAMES } from "../scripts/pi-sdk-smoke-contract.mjs";
 
 const packageJson = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
@@ -14,14 +15,9 @@ const publish = await readFile(
   "utf8",
 );
 
-test("pins the frozen SDK for tests without narrowing the published peer range", () => {
-  for (const name of [
-    "@earendil-works/pi-agent-core",
-    "@earendil-works/pi-ai",
-    "@earendil-works/pi-coding-agent",
-    "@earendil-works/pi-tui",
-  ]) {
-    assert.equal(packageJson.devDependencies[name], "1.2.0");
+test("pins exact SDK versions for tests without narrowing the published peer range", () => {
+  for (const name of SDK_NAMES) {
+    assert.match(packageJson.devDependencies[name], /^\d+\.\d+\.\d+$/);
   }
   assert.equal(packageJson.peerDependencies["@earendil-works/pi-coding-agent"], "*");
   assert.match(packageJson.scripts.ci, /npm run smoke:pi/);
