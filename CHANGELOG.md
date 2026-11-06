@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.8] - 2026-11-07
+
+### Changed
+
+- Pin development and smoke verification to Pi SDK 1.5.0 while preserving the published wildcard peer range.
+
 ## [0.1.7] - 2026-10-16
 
 ### Changed
