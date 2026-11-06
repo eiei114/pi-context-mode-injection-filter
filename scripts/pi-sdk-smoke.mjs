@@ -254,7 +254,7 @@ function makeCase(name, processResult, requests, marker, extra = {}) {
     command: "npm run smoke:pi",
     exit_code: processResult.exit_code,
     passed,
-    evidence: JSON.stringify(evidenceObject).slice(-6_000),
+    evidence: JSON.stringify(evidenceObject),
     assertions,
     has_unhandled_error: processResult.has_unhandled_error,
     has_load_error: processResult.has_load_error,
@@ -388,7 +388,7 @@ async function main() {
   }
   processResults.push(result);
   const hostCase = makeCase("host_shell", result, [], "native host shell");
-  hostCase.evidence = JSON.stringify({ process: compactResult(result), assertions: hostCase.assertions }).slice(-6_000);
+  hostCase.evidence = JSON.stringify({ process: compactResult(result), assertions: hostCase.assertions });
   cases.push(hostCase);
 
   const report = {
@@ -396,7 +396,7 @@ async function main() {
     verification_contract: VERIFICATION_CONTRACT,
     sdk_versions: installedVersions,
     platform: process.platform,
-    model_inference: "none; actual Pi 1.2.0 process with an offline local deterministic OpenAI-compatible provider; the Pi host, extension loader/lifecycle, provider request hook, and feature code are not mocked",
+    model_inference: "none; actual Pi 1.5.0 process with an offline local deterministic OpenAI-compatible provider; the Pi host, extension loader/lifecycle, provider request hook, and feature code are not mocked",
     unhandled_errors: processResults.filter((item) => item.has_unhandled_error).length,
     extension_load_errors: cases.filter((item) => item.has_load_error ||
       ((item.name === "extension_load" || item.name === "reload_cleanup") && !item.assertions[0]?.passed)).length,
