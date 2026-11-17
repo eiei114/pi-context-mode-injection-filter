@@ -19,7 +19,7 @@ function hasRoutingAnchor(value: unknown): boolean {
 
 function stripRoutingAnchor(value: unknown): unknown {
   if (typeof value === "string") {
-    return value.replace(ROUTING_ANCHOR, "").replace(/^\s+/, "");
+    return value.replaceAll(ROUTING_ANCHOR, "").replace(/^\s+/, "");
   }
   if (Array.isArray(value)) return value.map(stripRoutingAnchor);
   if (!isObject(value)) return value;
@@ -53,9 +53,18 @@ export function filterMessageList(messages: unknown[]): unknown[] {
   }
 
   // context-mode appends its synthetic user message after the real prompt.
-  // Keep any active-memory payload, but move it before the conversation so it
+  // Keep any active-memory payload, but move it after any leading system
+  // messages (the system prompt stays first) and before the conversation so it
   // cannot supersede the newest user request.
-  return [...injected, ...original];
+  const firstConversationIndex = original.findIndex(
+    (message) => !isObject(message) || message.role !== "system",
+  );
+  const insertAt =
+    firstConversationIndex === -1 ? original.length : firstConversationIndex;
+
+  const filtered = [...original];
+  filtered.splice(insertAt, 0, ...injected);
+  return filtered;
 }
 
 export function filterProviderPayload(payload: unknown): unknown | undefined {

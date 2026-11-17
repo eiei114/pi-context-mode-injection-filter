@@ -50,6 +50,61 @@ test("retains active memory and moves it before the conversation", () => {
   ]);
 });
 
+test("strips repeated routing anchors from synthetic messages", () => {
+  const messages = [
+    { role: "user", content: "real request" },
+    {
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text: `${ROUTING_ANCHOR}\n\n${ROUTING_ANCHOR}\n\nActive memory: prefer focused searches.`,
+        },
+      ],
+    },
+  ];
+
+  const filtered = filterMessageList(messages);
+
+  assert.ok(!JSON.stringify(filtered).includes(ROUTING_ANCHOR));
+  assert.deepEqual(filtered, [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Active memory: prefer focused searches." },
+      ],
+    },
+    messages[0],
+  ]);
+});
+
+test("keeps leading system messages first when retaining active memory", () => {
+  const messages = [
+    { role: "system", content: "You are a helpful agent." },
+    { role: "user", content: "real request" },
+    {
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text: `${ROUTING_ANCHOR}\n\nActive memory: prefer focused searches.`,
+        },
+      ],
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    { role: "system", content: "You are a helpful agent." },
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Active memory: prefer focused searches." },
+      ],
+    },
+    { role: "user", content: "real request" },
+  ]);
+});
+
 test("filters both messages and input arrays in provider payloads", () => {
   const payload = {
     model: "example",
