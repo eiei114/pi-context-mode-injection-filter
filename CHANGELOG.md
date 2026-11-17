@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.9] - 2026-11-18
+
+### Fixed
+
+- Keep retained active-memory context after leading system messages and strip all repeated routing anchors.
+
 ## [0.1.8] - 2026-11-07
 
 ### Changed
