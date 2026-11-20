@@ -65,7 +65,13 @@ export function filterMessageList(messages: unknown[]): unknown[] {
     }
 
     const cleaned = stripRoutingAnchor(message);
-    if (isObject(cleaned) && hasContent(cleaned.content)) injected.push(cleaned);
+    if (
+      isObject(cleaned) &&
+      (hasContent(cleaned.content) ||
+        (Array.isArray(cleaned.content) && cleaned.content.length > 0))
+    ) {
+      injected.push(cleaned);
+    }
   }
 
   // context-mode appends its synthetic user message after the real prompt.

@@ -84,6 +84,27 @@ test("preserves non-text content parts when their metadata contains the anchor",
   ]);
 });
 
+test("keeps image-only content when stripping removes the only text part", () => {
+  const messages = [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: ROUTING_ANCHOR },
+        { type: "image", source: { url: "https://example.test/image.png" } },
+      ],
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    {
+      role: "user",
+      content: [
+        { type: "image", source: { url: "https://example.test/image.png" } },
+      ],
+    },
+  ]);
+});
+
 test("drops a message when stripping empties its entire content array", () => {
   const messages = [
     { role: "user", content: "real request" },
