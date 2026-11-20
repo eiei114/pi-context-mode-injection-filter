@@ -30,7 +30,7 @@ function stripRoutingAnchor(
         entry,
         pruneEmptyContentParts && Array.isArray(entry),
       );
-      return pruneEmptyContentParts && hasRoutingAnchor(entry) && !hasContent(cleaned)
+      return pruneEmptyContentParts && hasContent(entry) && !hasContent(cleaned)
         ? []
         : [cleaned];
     });

@@ -36,7 +36,7 @@ test("removes only content parts emptied by stripping the routing anchor", () =>
         { type: "text", text: "", lead: "Keep this field", title: "Also keep this" },
         { type: "image", source: { url: "https://example.test/image.png" } },
       ],
-      metadata: { routingHints: [ROUTING_ANCHOR] },
+      metadata: { routingHints: [ROUTING_ANCHOR, "keep array position"] },
     },
   ];
 
@@ -48,9 +48,39 @@ test("removes only content parts emptied by stripping the routing anchor", () =>
         { type: "text", text: "", lead: "Keep this field", title: "Also keep this" },
         { type: "image", source: { url: "https://example.test/image.png" } },
       ],
-      metadata: { routingHints: [""] },
+      metadata: { routingHints: ["", "keep array position"] },
     },
     messages[0],
+  ]);
+});
+
+test("preserves non-text content parts when their metadata contains the anchor", () => {
+  const messages = [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "real request" },
+        {
+          type: "image",
+          title: ROUTING_ANCHOR,
+          source: { url: "https://example.test/image.png" },
+        },
+      ],
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "real request" },
+        {
+          type: "image",
+          title: "",
+          source: { url: "https://example.test/image.png" },
+        },
+      ],
+    },
   ]);
 });
 
