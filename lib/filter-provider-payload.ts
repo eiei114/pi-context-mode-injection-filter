@@ -21,7 +21,12 @@ function stripRoutingAnchor(value: unknown): unknown {
   if (typeof value === "string") {
     return value.replaceAll(ROUTING_ANCHOR, "").replace(/^\s+/, "");
   }
-  if (Array.isArray(value)) return value.map(stripRoutingAnchor);
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => {
+      const cleaned = stripRoutingAnchor(entry);
+      return hasRoutingAnchor(entry) && !hasContent(cleaned) ? [] : [cleaned];
+    });
+  }
   if (!isObject(value)) return value;
 
   return Object.fromEntries(
