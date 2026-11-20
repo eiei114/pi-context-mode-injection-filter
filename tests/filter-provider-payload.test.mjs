@@ -36,6 +36,7 @@ test("removes only content parts emptied by stripping the routing anchor", () =>
         { type: "text", text: "", lead: "Keep this field", title: "Also keep this" },
         { type: "image", source: { url: "https://example.test/image.png" } },
       ],
+      metadata: { routingHints: [ROUTING_ANCHOR] },
     },
   ];
 
@@ -47,6 +48,7 @@ test("removes only content parts emptied by stripping the routing anchor", () =>
         { type: "text", text: "", lead: "Keep this field", title: "Also keep this" },
         { type: "image", source: { url: "https://example.test/image.png" } },
       ],
+      metadata: { routingHints: [""] },
     },
     messages[0],
   ]);

@@ -17,20 +17,31 @@ function hasRoutingAnchor(value: unknown): boolean {
   return false;
 }
 
-function stripRoutingAnchor(value: unknown): unknown {
+function stripRoutingAnchor(
+  value: unknown,
+  pruneEmptyContentParts = false,
+): unknown {
   if (typeof value === "string") {
     return value.replaceAll(ROUTING_ANCHOR, "").replace(/^\s+/, "");
   }
   if (Array.isArray(value)) {
     return value.flatMap((entry) => {
-      const cleaned = stripRoutingAnchor(entry);
-      return hasRoutingAnchor(entry) && !hasContent(cleaned) ? [] : [cleaned];
+      const cleaned = stripRoutingAnchor(
+        entry,
+        pruneEmptyContentParts && Array.isArray(entry),
+      );
+      return pruneEmptyContentParts && hasRoutingAnchor(entry) && !hasContent(cleaned)
+        ? []
+        : [cleaned];
     });
   }
   if (!isObject(value)) return value;
 
   return Object.fromEntries(
-    Object.entries(value).map(([key, entry]) => [key, stripRoutingAnchor(entry)]),
+    Object.entries(value).map(([key, entry]) => [
+      key,
+      stripRoutingAnchor(entry, key === "content"),
+    ]),
   );
 }
 
