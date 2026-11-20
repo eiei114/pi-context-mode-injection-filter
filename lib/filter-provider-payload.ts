@@ -17,15 +17,31 @@ function hasRoutingAnchor(value: unknown): boolean {
   return false;
 }
 
-function stripRoutingAnchor(value: unknown): unknown {
+function stripRoutingAnchor(
+  value: unknown,
+  pruneEmptyContentParts = false,
+): unknown {
   if (typeof value === "string") {
     return value.replaceAll(ROUTING_ANCHOR, "").replace(/^\s+/, "");
   }
-  if (Array.isArray(value)) return value.map(stripRoutingAnchor);
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => {
+      const cleaned = stripRoutingAnchor(
+        entry,
+        pruneEmptyContentParts && Array.isArray(entry),
+      );
+      return pruneEmptyContentParts && hasContent(entry) && !hasContent(cleaned)
+        ? []
+        : [cleaned];
+    });
+  }
   if (!isObject(value)) return value;
 
   return Object.fromEntries(
-    Object.entries(value).map(([key, entry]) => [key, stripRoutingAnchor(entry)]),
+    Object.entries(value).map(([key, entry]) => [
+      key,
+      stripRoutingAnchor(entry, key === "content"),
+    ]),
   );
 }
 
@@ -49,7 +65,13 @@ export function filterMessageList(messages: unknown[]): unknown[] {
     }
 
     const cleaned = stripRoutingAnchor(message);
-    if (isObject(cleaned) && hasContent(cleaned.content)) injected.push(cleaned);
+    if (
+      isObject(cleaned) &&
+      (hasContent(cleaned.content) ||
+        (Array.isArray(cleaned.content) && cleaned.content.length > 0))
+    ) {
+      injected.push(cleaned);
+    }
   }
 
   // context-mode appends its synthetic user message after the real prompt.

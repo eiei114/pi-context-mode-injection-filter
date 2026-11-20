@@ -25,6 +25,95 @@ test("drops a synthetic message that contains only the routing anchor", () => {
   assert.deepEqual(filterMessageList(messages), [messages[0]]);
 });
 
+test("removes only content parts emptied by stripping the routing anchor", () => {
+  const messages = [
+    { role: "user", content: "real request" },
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Active memory: prefer focused searches." },
+        { type: "text", text: ROUTING_ANCHOR },
+        { type: "text", text: "", lead: "Keep this field", title: "Also keep this" },
+        { type: "image", source: { url: "https://example.test/image.png" } },
+      ],
+      metadata: { routingHints: [ROUTING_ANCHOR, "keep array position"] },
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Active memory: prefer focused searches." },
+        { type: "text", text: "", lead: "Keep this field", title: "Also keep this" },
+        { type: "image", source: { url: "https://example.test/image.png" } },
+      ],
+      metadata: { routingHints: ["", "keep array position"] },
+    },
+    messages[0],
+  ]);
+});
+
+test("preserves non-text content parts when their metadata contains the anchor", () => {
+  const messages = [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "real request" },
+        {
+          type: "image",
+          title: ROUTING_ANCHOR,
+          source: { url: "https://example.test/image.png" },
+        },
+      ],
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "real request" },
+        {
+          type: "image",
+          title: "",
+          source: { url: "https://example.test/image.png" },
+        },
+      ],
+    },
+  ]);
+});
+
+test("keeps image-only content when stripping removes the only text part", () => {
+  const messages = [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: ROUTING_ANCHOR },
+        { type: "image", source: { url: "https://example.test/image.png" } },
+      ],
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    {
+      role: "user",
+      content: [
+        { type: "image", source: { url: "https://example.test/image.png" } },
+      ],
+    },
+  ]);
+});
+
+test("drops a message when stripping empties its entire content array", () => {
+  const messages = [
+    { role: "user", content: "real request" },
+    { role: "user", content: [{ type: "text", text: ROUTING_ANCHOR }] },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [messages[0]]);
+});
+
 test("retains active memory and moves it before the conversation", () => {
   const messages = [
     { role: "user", content: "real request" },

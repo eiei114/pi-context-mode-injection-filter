@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.10] - 2026-11-20
+
+### Fixed
+
+- Remove content parts emptied by routing-anchor stripping and drop messages whose content becomes empty.
+
 ## [0.1.9] - 2026-11-18
 
 ### Fixed
