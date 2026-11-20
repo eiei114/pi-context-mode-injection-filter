@@ -5,6 +5,9 @@ import test from "node:test";
 const packageJson = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
+const packageLock = JSON.parse(
+  await readFile(new URL("../package-lock.json", import.meta.url), "utf8"),
+);
 const autoRelease = await readFile(
   new URL("../.github/workflows/auto-release.yml", import.meta.url),
   "utf8",
@@ -21,7 +24,9 @@ test("pins the frozen SDK for tests without narrowing the published peer range",
     "@earendil-works/pi-coding-agent",
     "@earendil-works/pi-tui",
   ]) {
-    assert.equal(packageJson.devDependencies[name], "1.5.0");
+    const manifestPin = packageJson.devDependencies[name];
+    assert.match(manifestPin, /^\d+\.\d+\.\d+$/);
+    assert.equal(packageLock.packages[`node_modules/${name}`]?.version, manifestPin);
   }
   assert.equal(packageJson.peerDependencies["@earendil-works/pi-coding-agent"], "*");
   assert.match(packageJson.scripts.ci, /npm run smoke:pi/);
