@@ -20,15 +20,28 @@ serialized provider payload immediately before each model request.
 
 When context-mode appends its known synthetic routing message after the real
 prompt, this extension removes the routing anchor. If that synthetic message also
-contains active-memory content, the extension keeps the content and moves it before
-the conversation. The user's latest request remains last.
+contains active-memory content, the extension keeps it after the consecutive
+leading `system` messages and before the rest of the original messages. If no
+original `system` message leads the array, the retained memory goes at the start.
+
+For example, `[routing guidance]` stands in for the exact routing anchor:
+
+```text
+Before                             | After
+system: Reply briefly.             | system: Reply briefly.
+user: List some colors.            | user: Active memory: favorite is blue.
+assistant: Blue and green.         | user: List some colors.
+user: Which one is my favorite?    | assistant: Blue and green.
+user: [routing guidance]           | user: Which one is my favorite?
+      Active memory: favorite is blue.
+```
 
 ## Features
 
-- Handles provider payloads that use either `messages` or `input` arrays.
+- Processes `messages` and `input` arrays independently when present; it never
+  merges them.
 - Removes the exact context-mode routing anchor recursively.
 - Keeps non-empty active-memory content from the synthetic message.
-- Moves retained synthetic context before original conversation messages.
 - Adds no runtime dependencies and performs no file or network I/O.
 
 ## Install
@@ -59,11 +72,12 @@ request through Pi's `before_provider_request` event.
 
 ## Compatibility
 
-This is an intentionally narrow compatibility shim. It recognizes the exact
-context-mode routing anchor exported in `lib/filter-provider-payload.ts`. If
-context-mode changes that text, this package may need a matching update. Any
-message containing that full anchor is treated as synthetic, so do not use this
-package when preserving a verbatim copy of the anchor in model input is required.
+This is an intentionally narrow compatibility shim, not a general payload
+sanitizer. It recognizes the exact context-mode routing anchor exported in
+`lib/filter-provider-payload.ts`. If context-mode changes that text, this package
+may need a matching update. Any message containing that full anchor is treated
+as synthetic, so do not use this package when preserving a verbatim copy of the
+anchor in model input is required.
 
 ## Package contents
 

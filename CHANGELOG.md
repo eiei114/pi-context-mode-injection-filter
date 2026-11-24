@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.11] - Unreleased
+
+### Documentation
+
+- Clarify where retained active memory appears in provider payloads.
+
 ## [0.1.10] - 2026-11-20
 
 ### Fixed
