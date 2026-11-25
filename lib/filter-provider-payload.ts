@@ -22,6 +22,7 @@ function stripRoutingAnchor(
   pruneEmptyContentParts = false,
 ): unknown {
   if (typeof value === "string") {
+    if (!value.includes(ROUTING_ANCHOR)) return value;
     return value.replaceAll(ROUTING_ANCHOR, "").replace(/^\s+/, "");
   }
   if (Array.isArray(value)) {

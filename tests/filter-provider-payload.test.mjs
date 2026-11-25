@@ -139,6 +139,32 @@ test("retains active memory and moves it before the conversation", () => {
   ]);
 });
 
+test("preserves leading whitespace in a separate anchor-free active-memory part", () => {
+  const memory = { type: "text", text: "\n\t  Active memory:\n    keep indentation.  \n" };
+  const system = { role: "system", content: "System prompt" };
+  const user = { role: "user", content: "earlier request" };
+  const assistant = { role: "assistant", content: "earlier response" };
+  const latest = { role: "user", content: "latest request" };
+  const messages = [
+    system,
+    user,
+    assistant,
+    latest,
+    {
+      role: "user",
+      content: [{ type: "text", text: ROUTING_ANCHOR }, memory],
+    },
+  ];
+
+  assert.deepEqual(filterMessageList(messages), [
+    system,
+    { role: "user", content: [memory] },
+    user,
+    assistant,
+    latest,
+  ]);
+});
+
 test("strips repeated routing anchors from synthetic messages", () => {
   const messages = [
     { role: "user", content: "real request" },

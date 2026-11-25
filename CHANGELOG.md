@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.12] - Unreleased
+
+### Fixed
+
+- Preserve leading whitespace in retained text that does not contain the routing anchor.
+
 ## [0.1.11] - Unreleased
 
 ### Documentation
